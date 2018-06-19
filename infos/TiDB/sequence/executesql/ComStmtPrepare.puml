@@ -1,0 +1,13 @@
+@startuml
+autonumber
+[-->tidb.server.conn_stmt:(cc *clientConn) handleStmtPrepare(sql)
+tidb.server.conn_stmt-->tidb.server.driver_tidb:(tc *TiDBContext) Prepare(sql) (stmt, columns, params, err)
+tidb.server.driver_tidb-->tidb.session.session:(s *session) PrepareStmt(sql)
+tidb.session.session-->tidb.executor.prepared:NewPrepareExec(ctx,infoschema,sqlTxt)
+tidb.session.session-->tidb.executor.prepared:(e *PrepareExec) NextChunk(ctx,chunk)
+tidb.server.driver_tidb<--tidb.session.session:(stmtID,paramCount,[]*ast.ResultField,error)
+
+
+tidb.server.conn_stmt<--tidb.server.driver_tidb:(PreparedStatement,columns, []*ColumnInfo,error)
+
+@enduml

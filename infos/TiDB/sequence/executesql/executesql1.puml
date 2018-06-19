@@ -1,0 +1,17 @@
+@startuml
+autonumber
+
+[-->tidb.server.server:(s *Server) onConn
+tidb.server.server-->tidb.server.server:(s *Server) newConn()
+tidb.server.server-->tidb.server.conn:(cc *clientConn) Run()
+activate tidb.server.conn
+activate tidb.server.conn
+tidb.server.conn-->tidb.server.conn:(cc *clientConn) readPacket()
+tidb.server.conn-->tidb.server.conn:(cc *clientConn) dispatch()
+activate tidb.server.conn
+tidb.server.conn-->tidb.server.conn:<b>switch cmd\nmysql.ComSleep\nmysql.ComQuit\nmysql.ComQuery\nmysql.ComPing\nmysql.ComInitDB\nmysql.ComFieldList\nmysql.ComStmtPrepare\nmysql.ComStmtExecute\nmysql.ComStmtClose\nmysql.ComStmtSendLongData\nmysql.ComStmtReset\nmysql.ComSetOption\n
+
+
+tidb.server.conn-->tidb.server.conn:(cc *clientConn) writeError()
+deactivate tidb.server.conn
+@enduml

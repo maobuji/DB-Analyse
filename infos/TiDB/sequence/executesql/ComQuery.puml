@@ -1,0 +1,52 @@
+@startuml
+autonumber
+[->tidb.server.conn:(cc *clientConn) handleQuery(ctx,sql)
+activate tidb.server.conn
+tidb.server.conn->tidb.server.driver_tidb:(tc *TiDBContext) Execute(ctx,sql)
+activate tidb.session.session
+tidb.server.driver_tidb->tidb.session.session:(s *session) Execute(ctx,sql)
+alt hitCatch==true
+tidb.session.session->tidb.util.sharded_lru:(s *ShardedLRUCache) Get(key)
+tidb.session.session->tidb.session.session:(s *session) executeStatement(ctx, connID, stmtNode, stmt, recordSets)
+activate tidb.session.session
+tidb.session.session->tidb.session.tidb:runStmt(ctx,sessionctx,ast.Statement)
+deactivate tidb.session.session
+
+else hitCatch==fase
+tidb.session.session->tidb.session.session:(s *session) ParseSQL(ctx,sql,charsetInfo,collation)
+tidb.session.session->tidb.executor.compiler:(c *Compiler) Compile(ctx,stmtNode)
+tidb.session.session->tidb.session.session:(s *session) executeStatement(ctx, connID, stmtNode, stmt, recordSets)
+activate tidb.session.session
+tidb.session.session->tidb.session.tidb:runStmt(ctx,sessionctx,ast.Statement)
+deactivate tidb.session.session
+deactivate tidb.session.session
+end
+
+alt len(rs==1)
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writeResultset(ctx context,ResultSet, binary, more)
+activate tidb.server.conn
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writeChunks(ctx context.Context, rs ResultSet, binary bool, more bool)
+activate tidb.server.conn
+loop
+tidb.server.conn->tidb.server.conn:NextChunk(context,Chunk)
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writePacket(data []byte)
+end
+deactivate tidb.server.conn
+deactivate tidb.server.conn
+else len(rs<>1)
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writeMultiResultset(ctx,ResultSet,binary)
+activate tidb.server.conn
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writeResultset(ctx,ResultSet,binary,more)
+activate tidb.server.conn
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writeChunks(ctx context.Context, rs ResultSet, binary bool, more bool)
+activate tidb.server.conn
+loop
+tidb.server.conn->tidb.server.conn:NextChunk(context,Chunk)
+tidb.server.conn->tidb.server.conn:(cc *clientConn) writePacket(data []byte)
+end
+end
+deactivate tidb.server.conn
+deactivate tidb.server.conn
+deactivate tidb.server.conn
+deactivate tidb.server.conn
+@enduml
