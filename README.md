@@ -33,7 +33,7 @@ NewSQL以及基于mysql分库分表的中间件的分析
 | DBProxy                 | 美团     | 开源 | C        | 提供代理连接池，底层同步机制不明，支持分库分表。源代码中有测试用例 | https://github.com/Meituan-Dianping/DBProxy        |
 | SOHU-DBProxy            | 搜狐     | 开源 | C        | 提供一个代理连接池，将读写分散到Galera集群上，并能够提供sql监控，进程杀死等能力。 | https://github.com/SOHUDBA/SOHU-DBProxy            |
 | sharding-sphere         | 开源团队 | 开源 | JAVA     | 原来的Sharding-jdbc.以jar包方式嵌入，支持分库分表            | https://github.com/sharding-sphere/sharding-sphere |
-| mixer                   | 开源团队 | 开源 | GO       | 一个简单的mysql代理工具，支持sharding                        | https://github.com/siddontang/mixer                |
+| mixer                   | 开源团队 | 开源 | GO       | 一个简单的mysql代理工具，支持sharding，参考了Vitess的实现，但语法支持mysql的原生语法。 | https://github.com/siddontang/mixer                |
 | Vitess                  | YouTube  | 开源 | GO       | 支持mysql分库分表，但是语法与mysql不兼容                     | https://github.com/vitessio/vitess                 |
 |                         |          |      |          |                                                              |                                                    |
 |                         |          |      |          |                                                              |                                                    |
