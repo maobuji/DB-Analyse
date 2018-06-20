@@ -8,14 +8,14 @@ NewSQL以及基于mysql分库分表的中间件的分析
 
 ### 数据库
 
-| 项目名称       | 提供者                      | 类型 | 实现语言 | 项目说明                                                    | 项目地址                                                     |
-| -------------- | --------------------------- | ---- | -------- | ----------------------------------------------------------- | ------------------------------------------------------------ |
-| mysql          | oracle                      |      |          |                                                             |                                                              |
-| mariadb        | Monty Widenius，mysql初创者 | 开源 |          | mysql的分支版本，支持MyISAM、InnoDB，XtraDB存储引擎         | https://mariadb.org/                                         |
-| Percona Server | Percona                     | 开源 |          | mysql的分支版本，不接受外部贡献作者。XtraDB存储引擎的原作者 | https://www.percona.com/software/mysql-database/percona-server |
-| TiDB           | PingCap                     | 开源 | go/rust  | pingcap团队开发的NewSQL数据库                               | https://github.com/pingcap/tidb                              |
-| TDSQL          | 腾讯                        | 闭源 |          | 基于MariaDB内核开发的分布式数据库                           | http://tdsql.org                                             |
-|                |                             |      |          |                                                             |                                                              |
+| 项目名称       | 提供者                      | 类型 | 实现语言 | 项目说明                                                     | 项目地址                                                     |
+| -------------- | --------------------------- | ---- | -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| mysql          | oracle                      |      |          |                                                              |                                                              |
+| mariadb        | Monty Widenius，mysql初创者 | 开源 |          | mysql的分支版本，支持MyISAM、InnoDB，XtraDB存储引擎          | https://mariadb.org/                                         |
+| Percona Server | Percona                     | 开源 |          | mysql的分支版本，不接受外部贡献作者。XtraDB存储引擎的原作者  | https://www.percona.com/software/mysql-database/percona-server |
+| TiDB           | PingCap                     | 开源 | go/rust  | pingcap团队开发的NewSQL数据库                                | https://github.com/pingcap/tidb                              |
+| TDSQL          | 腾讯                        | 闭源 |          | 基于MariaDB内核开发的分布式数据库                            | http://tdsql.org                                             |
+| Aurora         | 亚马逊                      |      |          | 一个兼容mysql并支持水平扩展的云数据库，底层结合ssd存储进行同步，性能有一定的提升 | https://amazonaws-china.com/cn/rds/aurora                    |
 
 
 
