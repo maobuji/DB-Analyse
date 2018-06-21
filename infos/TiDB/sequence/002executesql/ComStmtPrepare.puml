@@ -1,0 +1,30 @@
+@startuml
+autonumber
+
+[->"tidb.server.conn:dispatch(data)":ComStmtPrepare请求\n提交预编译语句
+"tidb.server.conn:dispatch(data)"->tidb.server.conn_stmt:(cc *clientConn) handleStmtPrepare(sql)
+tidb.server.conn_stmt->tidb.server.driver_tidb:(tc *TiDBContext) Prepare(sql) (stmt, columns, params, err)\n构造statement
+tidb.server.driver_tidb->tidb.session.session:(s *session) PrepareStmt(sql)
+tidb.session.session->tidb.executor.prepared:NewPrepareExec(ctx,infoschema,sqlTxt):PrepareExec\n获取一个执行器
+tidb.session.session->tidb.executor.prepared:(e *PrepareExec) NextChunk(ctx,chunk)
+tidb.server.driver_tidb<--tidb.session.session:(stmtID,paramCount,[]*ast.ResultField,error)
+tidb.server.driver_tidb->tidb.server.driver_tidb:使用stmtID创建stmt，将fields转换为columns
+tidb.server.conn_stmt<--tidb.server.driver_tidb:(PreparedStatement,columns, []*ColumnInfo,error)
+tidb.server.conn_stmt->tidb.server.conn_stmt:make data\n根据<font color=red>stmtID</font>和列信息以及参数信息构造返回信息
+tidb.server.conn_stmt->tidb.server.conn:(cc *clientConn) writePacket(data []byte)\n将消息包发往客户端
+tidb.server.conn_stmt->tidb.server.conn:(cc *clientConn) writeEOF(more)\n 发送终止信息
+
+[->"tidb.server.conn:dispatch(data)":ComStmtExecute请求\n提交数据
+"tidb.server.conn:dispatch(data)"->tidb.server.conn_stmt:(cc *clientConn) handleStmtExecute(ctx,data)
+tidb.server.conn_stmt->tidb.server.driver:(tc *TiDBContext) GetStatement(stmtID) PreparedStatement\n解析出请求中的<font color=red>stmtID</font>，并从缓存中获得PreparedStatement(实现为TiDBStatement)
+tidb.server.conn_stmt->tidb.server.driver_tidb:(ts *TiDBStatement) Execute(ctx,args)
+tidb.server.driver_tidb->tidb.session.session:(s *session) ExecutePreparedStmt(ctx,stmtID, args ...interface{})
+tidb.session.session->tidb.parser.yy_parser:(parser *Parser) Parse(sql, charset, collation string)\n执行sql解释获得ast.StmtNode执行计划
+tidb.session.session->tidb.executor.prepared:CompileExecutePreparedStmt(ctx,stmtID,args ...interface{})
+tidb.executor.prepared->tidb.plan.optimizer:ptimize(ctx,ast.Node,infoschema.InfoSchema) (Plan, error) \n优化为具体的执行计划
+tidb.session.session->tidb.session.tidb:runStmt(ctx, sessionctx,ast.Statement) \n运行执行计划获得结果集
+tidb.server.driver_tidb<--tidb.session.session: (ast.RecordSet, error) \n返回结果集
+tidb.server.conn_stmt<--tidb.server.driver_tidb:ResultSet  \n将tidbRecordset包装为tidbResultSet进行返回
+
+
+@enduml

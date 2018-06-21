@@ -1,6 +1,9 @@
 @startuml
 autonumber
-[->tidb.server.conn:(cc *clientConn) handleQuery(ctx,sql)
+
+[->"tidb.server.conn:dispatch(data)":ComQuery请求\n
+
+"tidb.server.conn:dispatch(data)"->tidb.server.conn:(cc *clientConn) handleQuery(ctx,sql)
 activate tidb.server.conn
 tidb.server.conn->tidb.server.driver_tidb:(tc *TiDBContext) Execute(ctx,sql)
 activate tidb.session.session

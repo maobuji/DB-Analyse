@@ -1,0 +1,36 @@
+@startuml
+autonumber
+->"tidb.tidb-server":main()
+"tidb.tidb-server"->"tidb.tidb-server":createServer()\n创建服务端,初始化listener
+"tidb.tidb-server"->"tidb.tidb-server":runServer()\n启动服务端
+activate "tidb.tidb-server"
+"tidb.tidb-server"->tidb.server.server:(s *Server) Run()
+loop
+tidb.server.server->net.Listener:Accept()
+tidb.server.server<--net.Listener:Conn
+
+tidb.server.server->tidb.server.server:<font color=red><b>go (s *Server) onConn(net.Conn)\n开启协程处理连接
+activate tidb.server.server
+tidb.server.server->tidb.server.server:(s *Server) newConn(net.Conn):clientConn\n将网络连接转换为客户端连接
+tidb.server.server->tidb.server.conn:(cc *clientConn) Run()
+
+loop
+tidb.server.conn-->tidb.server.conn:(cc *clientConn) readPacket():data\n读取客户端发送的请求包
+tidb.server.conn-->tidb.server.conn:(cc *clientConn) dispatch(data)\n分发处理获得的二进制数据
+activate tidb.server.conn
+tidb.server.conn-->tidb.server.conn:<b>switch cmd\nmysql.ComSleep\nmysql.ComQuit\nmysql.ComQuery\nmysql.ComPing\nmysql.ComInitDB\nmysql.ComFieldList\nmysql.ComStmtPrepare\nmysql.ComStmtExecute\nmysql.ComStmtClose\nmysql.ComStmtSendLongData\nmysql.ComStmtReset\nmysql.ComSetOption\n
+
+
+tidb.server.conn-->tidb.server.conn:(cc *clientConn) writeError(error)\n如果分发处理出错，则回写错误
+deactivate tidb.server.conn
+
+end
+tidb.server.server<--tidb.server.conn:接收到结束标志或者出错则结束
+deactivate tidb.server.server
+
+
+end
+"tidb.tidb-server"<--tidb.server.server:接收连接失败或者出错则结束
+
+deactivate "tidb.tidb-server"
+@enduml
